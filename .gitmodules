@@ -1,0 +1,6 @@
+[submodule "dosemu2"]
+	path = dosemu2
+	url = https://github.com/dosemu2/dosemu2.git
+[submodule "fdpp"]
+	path = fdpp
+	url = https://github.com/dosemu2/fdpp.git

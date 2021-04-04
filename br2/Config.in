@@ -1,0 +1,2 @@
+source "$BR2_EXTERNAL_FDPP_PATH/package/dosemu2/Config.in"
+#source "$BR2_EXTERNAL_FDPP_PATH/package/fdpp/Config.in

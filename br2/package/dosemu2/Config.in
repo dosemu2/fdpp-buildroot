@@ -1,0 +1,5 @@
+config BR2_PACKAGE_DOSEMU2
+    bool "dosemu2"
+    help
+    dosemu2 is a virtual machine that allows you to run DOS
+    programs under linux.
