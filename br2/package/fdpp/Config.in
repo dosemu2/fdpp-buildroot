@@ -1,0 +1,5 @@
+config BR2_PACKAGE_FDPP
+    bool "fdpp"
+    select BR2_TOOLCHAIN_BUILDROOT_CXX
+    help
+      freedos++.

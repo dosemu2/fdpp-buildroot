@@ -1,5 +1,6 @@
 config BR2_PACKAGE_DOSEMU2
     bool "dosemu2"
+    select BR2_PACKAGE_LIBAO
     help
-    dosemu2 is a virtual machine that allows you to run DOS
-    programs under linux.
+      dosemu2 is a virtual machine that allows you to run DOS
+      programs under linux.
