@@ -4,6 +4,8 @@ FDPP_LICENSE = GPL-3.0+
 FDPP_LICENSE_FILES = COPYING
 FDPP_INSTALL_STAGING = YES
 
+FDPP_DEPENDENCIES += elfutils
+
 define FDPP_BUILD_CMDS
     cd $(@D) && $$fdpp_SRCDIR/configure && make PREFIX=/usr
 endef
