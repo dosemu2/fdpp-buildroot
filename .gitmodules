@@ -4,3 +4,6 @@
 [submodule "fdpp"]
 	path = fdpp
 	url = https://github.com/dosemu2/fdpp.git
+[submodule "buildroot"]
+	path = buildroot
+	url = git://git.buildroot.net/buildroot
