@@ -2,6 +2,7 @@ config BR2_PACKAGE_DOSEMU2
     bool "dosemu2"
     depends on BR2_i386 || BR2_x86_64
     depends on BR2_PACKAGE_FDPP
+    depends on BR2_PACKAGE_COMCOM32
     select BR2_PACKAGE_BUSYBOX_SHOW_OTHERS
     select BR2_PACKAGE_BASH
     select BR2_PACKAGE_SUDO

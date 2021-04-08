@@ -1,0 +1,4 @@
+config BR2_PACKAGE_COMCOM32
+    bool "comcom32"
+    help
+      32bit command.com
