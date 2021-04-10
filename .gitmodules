@@ -7,3 +7,6 @@
 [submodule "buildroot"]
 	path = buildroot
 	url = git://git.buildroot.net/buildroot
+[submodule "comcom32"]
+	path = comcom32
+	url = https://github.com/dosemu2/comcom32.git
