@@ -23,3 +23,6 @@ grep -v UUID "$TARGET_DIR/etc/fstab" >"$TARGET_DIR/etc/fstab_"
 echo "UUID=\"$UUID\" /mnt/drive_c ext4 rw,nodev,nosuid,noexec,noatime 0 0" >>"$TARGET_DIR/etc/fstab_"
 mv "$TARGET_DIR/etc/fstab_" "$TARGET_DIR/etc/fstab"
 [ -d "$TARGET_DIR/mnt/drive_c" ] || mkdir "$TARGET_DIR/mnt/drive_c"
+
+[ -d "$TARGET_DIR/etc/sudoers.d" ] || mkdir "$TARGET_DIR/etc/sudoers.d"
+cp -f "$BOARD_DIR/sudoers.d"/* "$TARGET_DIR/etc/sudoers.d/"
