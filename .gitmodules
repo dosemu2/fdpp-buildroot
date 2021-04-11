@@ -1,12 +1,16 @@
 [submodule "dosemu2"]
 	path = dosemu2
 	url = https://github.com/dosemu2/dosemu2.git
+	devel = devel
 [submodule "fdpp"]
 	path = fdpp
 	url = https://github.com/dosemu2/fdpp.git
+	master = master
 [submodule "buildroot"]
 	path = buildroot
 	url = git://git.buildroot.net/buildroot
+	master = master
 [submodule "comcom32"]
 	path = comcom32
 	url = https://github.com/dosemu2/comcom32.git
+	master = master
