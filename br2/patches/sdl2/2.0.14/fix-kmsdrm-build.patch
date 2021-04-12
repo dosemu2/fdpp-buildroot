@@ -1,0 +1,472 @@
+diff -r 0c4b3097cb2b -r 2926052d55f5 configure.ac
+--- a/configure.ac	Mon Dec 21 14:43:38 2020 -0800
++++ b/configure.ac	Tue Dec 22 14:15:33 2020 +0100
+@@ -2236,7 +2236,10 @@
+ AS_HELP_STRING([--enable-video-kmsdrm], [use KMSDRM video driver [[default=no]]]),
+                   , enable_video_kmsdrm=no)
+ 
+-    if test x$enable_video = xyes -a x$enable_video_kmsdrm = xyes; then
++    if  test x$enable_video = xyes && \
++        test x$enable_video_kmsdrm = xyes && \
++        test x$video_opengl_egl = xyes; then
++
+         video_kmsdrm=no
+ 
+         PKG_CHECK_MODULES([LIBDRM], [libdrm >= 1.4.82], libdrm_avail=yes, libdrm_avail=no)
+@@ -2418,6 +2421,28 @@
+     fi
+ }
+ 
++dnl Find EGL
++CheckEGLKMSDRM()
++{
++    AC_MSG_CHECKING(for EGL support)
++    video_opengl_egl=no
++    AC_TRY_COMPILE([
++      #define LINUX
++      #define EGL_API_FB
++      #define MESA_EGL_NO_X11_HEADERS
++      #define EGL_NO_X11
++      #include <EGL/egl.h>
++      #include <EGL/eglext.h>
++    ],[
++    ],[
++    video_opengl_egl=yes
++    ])
++    AC_MSG_RESULT($video_opengl_egl)
++    if test x$video_opengl_egl = xyes; then
++	AC_DEFINE(SDL_VIDEO_OPENGL_EGL, 1, [ ])
++    fi
++}
++
+ dnl Check for Windows OpenGL
+ CheckWINDOWSGL()
+ {
+@@ -3555,6 +3580,8 @@
+         CheckRPI
+         CheckX11
+         CheckDirectFB
++        # Need to check for EGL first because KMSDRM depends on it.
++        CheckEGLKMSDRM
+         CheckKMSDRM
+         CheckOpenGLX11
+         CheckOpenGLESX11
+diff -r 0c4b3097cb2b -r 2926052d55f5 src/video/kmsdrm/SDL_kmsdrmopengles.c
+--- a/src/video/kmsdrm/SDL_kmsdrmopengles.c	Mon Dec 21 14:43:38 2020 -0800
++++ b/src/video/kmsdrm/SDL_kmsdrmopengles.c	Tue Dec 22 14:15:33 2020 +0100
+@@ -22,7 +22,7 @@
+ 
+ #include "../../SDL_internal.h"
+ 
+-#if SDL_VIDEO_DRIVER_KMSDRM && SDL_VIDEO_OPENGL_EGL
++#if SDL_VIDEO_DRIVER_KMSDRM
+ 
+ #include "SDL_kmsdrmvideo.h"
+ #include "SDL_kmsdrmopengles.h"
+@@ -376,6 +376,6 @@
+ 
+ SDL_EGL_MakeCurrent_impl(KMSDRM)
+ 
+-#endif /* SDL_VIDEO_DRIVER_KMSDRM && SDL_VIDEO_OPENGL_EGL */
++#endif /* SDL_VIDEO_DRIVER_KMSDRM */
+ 
+ /* vi: set ts=4 sw=4 expandtab: */
+diff -r 0c4b3097cb2b -r 2926052d55f5 src/video/kmsdrm/SDL_kmsdrmopengles.h
+--- a/src/video/kmsdrm/SDL_kmsdrmopengles.h	Mon Dec 21 14:43:38 2020 -0800
++++ b/src/video/kmsdrm/SDL_kmsdrmopengles.h	Tue Dec 22 14:15:33 2020 +0100
+@@ -24,7 +24,7 @@
+ #ifndef SDL_kmsdrmopengles_h_
+ #define SDL_kmsdrmopengles_h_
+ 
+-#if SDL_VIDEO_DRIVER_KMSDRM && SDL_VIDEO_OPENGL_EGL
++#if SDL_VIDEO_DRIVER_KMSDRM
+ 
+ #include "../SDL_sysvideo.h"
+ #include "../SDL_egl_c.h"
+@@ -42,7 +42,7 @@
+ extern int KMSDRM_GLES_SwapWindow(_THIS, SDL_Window * window);
+ extern int KMSDRM_GLES_MakeCurrent(_THIS, SDL_Window * window, SDL_GLContext context);
+ 
+-#endif /* SDL_VIDEO_DRIVER_KMSDRM && SDL_VIDEO_OPENGL_EGL */
++#endif /* SDL_VIDEO_DRIVER_KMSDRM */
+ 
+ #endif /* SDL_kmsdrmopengles_h_ */
+ 
+diff -r 0c4b3097cb2b -r 2926052d55f5 src/video/kmsdrm/SDL_kmsdrmvideo.c
+--- a/src/video/kmsdrm/SDL_kmsdrmvideo.c	Mon Dec 21 14:43:38 2020 -0800
++++ b/src/video/kmsdrm/SDL_kmsdrmvideo.c	Tue Dec 22 14:15:33 2020 +0100
+@@ -846,7 +846,6 @@
+     device->SetWindowGrab = KMSDRM_SetWindowGrab;
+     device->DestroyWindow = KMSDRM_DestroyWindow;
+     device->GetWindowWMInfo = KMSDRM_GetWindowWMInfo;
+-#if SDL_VIDEO_OPENGL_EGL
+     device->GL_DefaultProfileConfig = KMSDRM_GLES_DefaultProfileConfig;
+     device->GL_LoadLibrary = KMSDRM_GLES_LoadLibrary;
+     device->GL_GetProcAddress = KMSDRM_GLES_GetProcAddress;
+@@ -857,9 +856,7 @@
+     device->GL_GetSwapInterval = KMSDRM_GLES_GetSwapInterval;
+     device->GL_SwapWindow = KMSDRM_GLES_SwapWindow;
+     device->GL_DeleteContext = KMSDRM_GLES_DeleteContext;
+-#endif
+-    device->PumpEvents = KMSDRM_PumpEvents;
+-    device->free = KMSDRM_DeleteDevice;
++
+ #if SDL_VIDEO_VULKAN
+     device->Vulkan_LoadLibrary = KMSDRM_Vulkan_LoadLibrary;
+     device->Vulkan_UnloadLibrary = KMSDRM_Vulkan_UnloadLibrary;
+@@ -867,6 +864,10 @@
+     device->Vulkan_CreateSurface = KMSDRM_Vulkan_CreateSurface;
+     device->Vulkan_GetDrawableSize = KMSDRM_Vulkan_GetDrawableSize;
+ #endif
++
++    device->PumpEvents = KMSDRM_PumpEvents;
++    device->free = KMSDRM_DeleteDevice;
++
+     return device;
+ 
+ cleanup:
+@@ -1327,9 +1328,7 @@
+     SDL_DisplayData *dispdata = (SDL_DisplayData *)SDL_GetDisplayDriverData(0);
+     KMSDRM_PlaneInfo plane_info = {0};
+ 
+-#if SDL_VIDEO_OPENGL_EGL
+     EGLContext egl_context;
+-#endif
+ 
+     /********************************************************************/
+     /* BLOCK 1: protect the PRIMARY PLANE before destroying the buffers */
+@@ -1380,7 +1379,6 @@
+     /* will get wrong info and we will be in trouble.                          */
+     /***************************************************************************/
+ 
+-#if SDL_VIDEO_OPENGL_EGL
+     egl_context = (EGLContext)SDL_GL_GetCurrentContext();
+     SDL_EGL_MakeCurrent(_this, EGL_NO_SURFACE, egl_context);
+ 
+@@ -1388,7 +1386,6 @@
+         SDL_EGL_DestroySurface(_this, windata->egl_surface);
+         windata->egl_surface = EGL_NO_SURFACE;
+     }
+-#endif
+ 
+     if (windata->gs) {
+         KMSDRM_gbm_surface_destroy(windata->gs);
+@@ -1431,7 +1428,6 @@
+         return SDL_SetError("Could not create GBM surface");
+     }
+ 
+-#if SDL_VIDEO_OPENGL_EGL
+     /* We can't get the EGL context yet because SDL_CreateRenderer has not been called,
+        but we need an EGL surface NOW, or GL won't be able to render into any surface
+        and we won't see the first frame. */
+@@ -1448,8 +1444,6 @@
+     egl_context = (EGLContext)SDL_GL_GetCurrentContext();
+     ret = SDL_EGL_MakeCurrent(_this, windata->egl_surface, egl_context);
+ 
+-#endif
+-
+ cleanup:
+ 
+     if (ret) {
+@@ -1478,11 +1472,11 @@
+ 
+     if (!is_vulkan) {
+         KMSDRM_DestroySurfaces(_this, window);
+-#if SDL_VIDEO_OPENGL_EGL
++
+         if (_this->egl_data) {
+             SDL_EGL_UnloadLibrary(_this);
+         }
+-#endif
++
+         if (dispdata->gbm_init) {
+             KMSDRM_DeinitMouse(_this);
+             KMSDRM_GBMDeinit(_this, dispdata);
+@@ -1754,7 +1748,6 @@
+                  goto cleanup;
+          }
+ 
+-#if SDL_VIDEO_OPENGL_EGL
+          /* Manually load the EGL library. KMSDRM_EGL_LoadLibrary() has already
+             been called by SDL_CreateWindow() but we don't do anything there,
+             precisely to be able to load it here.
+@@ -1766,7 +1759,6 @@
+                  goto cleanup;
+              }
+          }
+-#endif
+ 
+          /* Can't init mouse stuff sooner because cursor plane is not ready. */
+          KMSDRM_InitMouse(_this);
+diff -r 0c4b3097cb2b -r 2926052d55f5 src/video/kmsdrm/SDL_kmsdrmvideo.h
+--- a/src/video/kmsdrm/SDL_kmsdrmvideo.h	Mon Dec 21 14:43:38 2020 -0800
++++ b/src/video/kmsdrm/SDL_kmsdrmvideo.h	Tue Dec 22 14:15:33 2020 +0100
+@@ -34,10 +34,8 @@
+ 
+ #include <gbm.h>
+ #include <assert.h>
+-#if SDL_VIDEO_OPENGL_EGL
+ #include <EGL/egl.h>
+ #include <EGL/eglext.h>
+-#endif
+ 
+ /****************************************************************************************/
+ /* Driverdata pointers are void struct* used to store backend-specific variables        */
+@@ -101,10 +99,6 @@
+     EGLSyncKHR kms_fence;
+     EGLSyncKHR gpu_fence;
+ 
+-#if SDL_VIDEO_OPENGL_EGL
+-    EGLSurface old_egl_surface;
+-#endif
+-
+     SDL_bool modeset_pending;
+     SDL_bool gbm_init;
+ 
+@@ -129,9 +123,7 @@
+     struct gbm_bo *bo;
+     struct gbm_bo *next_bo;
+ 
+-#if SDL_VIDEO_OPENGL_EGL
+     EGLSurface egl_surface;
+-#endif
+ 
+     /* For scaling and AR correction. */
+     int32_t src_w;
+diff -r 0c4b3097cb2b -r 2926052d55f5 src/video/kmsdrm_legacy/SDL_kmsdrm_legacy_opengles.c
+--- a/src/video/kmsdrm_legacy/SDL_kmsdrm_legacy_opengles.c	Mon Dec 21 14:43:38 2020 -0800
++++ b/src/video/kmsdrm_legacy/SDL_kmsdrm_legacy_opengles.c	Tue Dec 22 14:15:33 2020 +0100
+@@ -21,7 +21,7 @@
+ 
+ #include "../../SDL_internal.h"
+ 
+-#if SDL_VIDEO_DRIVER_KMSDRM && SDL_VIDEO_OPENGL_EGL
++#if SDL_VIDEO_DRIVER_KMSDRM
+ 
+ #include "SDL_log.h"
+ 
+@@ -147,6 +147,6 @@
+ 
+ SDL_EGL_MakeCurrent_impl(KMSDRM_LEGACY)
+ 
+-#endif /* SDL_VIDEO_DRIVER_KMSDRM && SDL_VIDEO_OPENGL_EGL */
++#endif /* SDL_VIDEO_DRIVER_KMSDRM */
+ 
+ /* vi: set ts=4 sw=4 expandtab: */
+diff -r 0c4b3097cb2b -r 2926052d55f5 src/video/kmsdrm_legacy/SDL_kmsdrm_legacy_opengles.h
+--- a/src/video/kmsdrm_legacy/SDL_kmsdrm_legacy_opengles.h	Mon Dec 21 14:43:38 2020 -0800
++++ b/src/video/kmsdrm_legacy/SDL_kmsdrm_legacy_opengles.h	Tue Dec 22 14:15:33 2020 +0100
+@@ -23,7 +23,7 @@
+ #ifndef SDL_kmsdrmopengles_h_
+ #define SDL_kmsdrmopengles_h_
+ 
+-#if SDL_VIDEO_DRIVER_KMSDRM && SDL_VIDEO_OPENGL_EGL
++#if SDL_VIDEO_DRIVER_KMSDRM
+ 
+ #include "../SDL_sysvideo.h"
+ #include "../SDL_egl_c.h"
+@@ -41,7 +41,7 @@
+ extern int KMSDRM_LEGACY_GLES_SwapWindow(_THIS, SDL_Window * window);
+ extern int KMSDRM_LEGACY_GLES_MakeCurrent(_THIS, SDL_Window * window, SDL_GLContext context);
+ 
+-#endif /* SDL_VIDEO_DRIVER_KMSDRM && SDL_VIDEO_OPENGL_EGL */
++#endif /* SDL_VIDEO_DRIVER_KMSDRM */
+ 
+ #endif /* SDL_kmsdrmopengles_h_ */
+ 
+diff -r 0c4b3097cb2b -r 2926052d55f5 src/video/kmsdrm_legacy/SDL_kmsdrm_legacy_video.c
+--- a/src/video/kmsdrm_legacy/SDL_kmsdrm_legacy_video.c	Mon Dec 21 14:43:38 2020 -0800
++++ b/src/video/kmsdrm_legacy/SDL_kmsdrm_legacy_video.c	Tue Dec 22 14:15:33 2020 +0100
+@@ -213,7 +213,7 @@
+     device->SetWindowGrab = KMSDRM_LEGACY_SetWindowGrab;
+     device->DestroyWindow = KMSDRM_LEGACY_DestroyWindow;
+     device->GetWindowWMInfo = KMSDRM_LEGACY_GetWindowWMInfo;
+-#if SDL_VIDEO_OPENGL_EGL
++
+     device->GL_LoadLibrary = KMSDRM_LEGACY_GLES_LoadLibrary;
+     device->GL_GetProcAddress = KMSDRM_LEGACY_GLES_GetProcAddress;
+     device->GL_UnloadLibrary = KMSDRM_LEGACY_GLES_UnloadLibrary;
+@@ -223,7 +223,7 @@
+     device->GL_GetSwapInterval = KMSDRM_LEGACY_GLES_GetSwapInterval;
+     device->GL_SwapWindow = KMSDRM_LEGACY_GLES_SwapWindow;
+     device->GL_DeleteContext = KMSDRM_LEGACY_GLES_DeleteContext;
+-#endif
++
+     device->PumpEvents = KMSDRM_LEGACY_PumpEvents;
+     device->free = KMSDRM_LEGACY_DeleteDevice;
+ 
+@@ -369,14 +369,12 @@
+         windata->next_bo = NULL;
+     }
+ 
+-#if SDL_VIDEO_OPENGL_EGL
+     SDL_EGL_MakeCurrent(_this, EGL_NO_SURFACE, EGL_NO_CONTEXT);
+ 
+     if (windata->egl_surface != EGL_NO_SURFACE) {
+         SDL_EGL_DestroySurface(_this, windata->egl_surface);
+         windata->egl_surface = EGL_NO_SURFACE;
+     }
+-#endif
+ 
+     if (windata->gs) {
+         KMSDRM_LEGACY_gbm_surface_destroy(windata->gs);
+@@ -394,18 +392,14 @@
+     Uint32 height = dispdata->mode.vdisplay;
+     Uint32 surface_fmt = GBM_FORMAT_XRGB8888;
+     Uint32 surface_flags = GBM_BO_USE_SCANOUT | GBM_BO_USE_RENDERING;
+-#if SDL_VIDEO_OPENGL_EGL
+     EGLContext egl_context;
+-#endif
+ 
+     if (!KMSDRM_LEGACY_gbm_device_is_format_supported(viddata->gbm, surface_fmt, surface_flags)) {
+         SDL_LogWarn(SDL_LOG_CATEGORY_VIDEO, "GBM surface format not supported. Trying anyway.");
+     }
+ 
+-#if SDL_VIDEO_OPENGL_EGL
+     SDL_EGL_SetRequiredVisualId(_this, surface_fmt);
+     egl_context = (EGLContext)SDL_GL_GetCurrentContext();
+-#endif
+ 
+     KMSDRM_LEGACY_DestroySurfaces(_this, window);
+ 
+@@ -415,7 +409,6 @@
+         return SDL_SetError("Could not create GBM surface");
+     }
+ 
+-#if SDL_VIDEO_OPENGL_EGL
+     windata->egl_surface = SDL_EGL_CreateSurface(_this, (NativeWindowType)windata->gs);
+ 
+     if (windata->egl_surface == EGL_NO_SURFACE) {
+@@ -425,7 +418,6 @@
+     SDL_EGL_MakeCurrent(_this, windata->egl_surface, egl_context);
+ 
+     windata->egl_surface_dirty = 0;
+-#endif
+ 
+     return 0;
+ }
+@@ -734,15 +726,9 @@
+         SDL_Window *window = viddata->windows[i];
+         SDL_WindowData *windata = (SDL_WindowData *)window->driverdata;
+ 
+-#if SDL_VIDEO_OPENGL_EGL
+         /* Can't recreate EGL surfaces right now, need to wait until SwapWindow
+            so the correct thread-local surface and context state are available */
+         windata->egl_surface_dirty = 1;
+-#else
+-        if (KMSDRM_LEGACY_CreateSurfaces(_this, window)) {
+-            return -1;
+-        }
+-#endif
+ 
+         /* Tell app about the resize */
+         SDL_SendWindowEvent(window, SDL_WINDOWEVENT_RESIZED, mode->w, mode->h);
+@@ -758,13 +744,11 @@
+     SDL_WindowData *windata;
+     SDL_VideoDisplay *display;
+ 
+-#if SDL_VIDEO_OPENGL_EGL
+     if (!_this->egl_data) {
+         if (SDL_GL_LoadLibrary(NULL) < 0) {
+             goto error;
+         }
+     }
+-#endif
+ 
+     /* Allocate window internal data */
+     windata = (SDL_WindowData *)SDL_calloc(1, sizeof(SDL_WindowData));
+diff -r 0c4b3097cb2b -r 2926052d55f5 src/video/kmsdrm_legacy/SDL_kmsdrm_legacy_video.h
+--- a/src/video/kmsdrm_legacy/SDL_kmsdrm_legacy_video.h	Mon Dec 21 14:43:38 2020 -0800
++++ b/src/video/kmsdrm_legacy/SDL_kmsdrm_legacy_video.h	Tue Dec 22 14:15:33 2020 +0100
+@@ -31,9 +31,7 @@
+ #include <xf86drm.h>
+ #include <xf86drmMode.h>
+ #include <gbm.h>
+-#if SDL_VIDEO_OPENGL_EGL
+ #include <EGL/egl.h>
+-#endif
+ 
+ typedef struct SDL_VideoData
+ {
+@@ -71,10 +69,10 @@
+     struct gbm_bo *crtc_bo;
+     SDL_bool waiting_for_flip;
+     SDL_bool double_buffer;
+-#if SDL_VIDEO_OPENGL_EGL
++
+     int egl_surface_dirty;
+     EGLSurface egl_surface;
+-#endif
++
+ } SDL_WindowData;
+ 
+ typedef struct KMSDRM_LEGACY_FBInfo
+--- a/configure	2020-12-21 20:44:36.000000000 +0300
++++ b/configure	2021-04-12 14:43:34.008621439 +0300
+@@ -21962,7 +21972,10 @@
+ fi
+ 
+ 
+-    if test x$enable_video = xyes -a x$enable_video_kmsdrm = xyes; then
++    if  test x$enable_video = xyes && \
++        test x$enable_video_kmsdrm = xyes && \
++        test x$video_opengl_egl = xyes; then
++
+         video_kmsdrm=no
+ 
+ 
+@@ -22400,6 +22413,45 @@
+     fi
+ }
+ 
++CheckEGLKMSDRM()
++{
++    { $as_echo "$as_me:${as_lineno-$LINENO}: checking for EGL support" >&5
++$as_echo_n "checking for EGL support... " >&6; }
++    video_opengl_egl=no
++    cat confdefs.h - <<_ACEOF >conftest.$ac_ext
++/* end confdefs.h.  */
++
++      #define LINUX
++      #define EGL_API_FB
++      #define MESA_EGL_NO_X11_HEADERS
++      #define EGL_NO_X11
++      #include <EGL/egl.h>
++      #include <EGL/eglext.h>
++
++int
++main ()
++{
++
++
++  ;
++  return 0;
++}
++_ACEOF
++if ac_fn_c_try_compile "$LINENO"; then :
++
++    video_opengl_egl=yes
++
++fi
++rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
++    { $as_echo "$as_me:${as_lineno-$LINENO}: result: $video_opengl_egl" >&5
++$as_echo "$video_opengl_egl" >&6; }
++    if test x$video_opengl_egl = xyes; then
++
++$as_echo "#define SDL_VIDEO_OPENGL_EGL 1" >>confdefs.h
++
++    fi
++}
++
+ CheckWINDOWSGL()
+ {
+     if test x$enable_video = xyes -a x$enable_video_opengl = xyes; then
+@@ -24751,6 +24803,8 @@
+         CheckRPI
+         CheckX11
+         CheckDirectFB
++        # Need to check for EGL first because KMSDRM depends on it.
++        CheckEGLKMSDRM
+         CheckKMSDRM
+         CheckOpenGLX11
+         CheckOpenGLESX11
