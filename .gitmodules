@@ -14,3 +14,6 @@
 	path = comcom32
 	url = https://github.com/dosemu2/comcom32.git
 	master = master
+[submodule "sdl2"]
+	path = sdl2
+	url = https://github.com/libsdl-org/SDL.git
