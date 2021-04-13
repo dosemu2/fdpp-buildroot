@@ -1,0 +1,13 @@
+--- a/src/video/kmsdrm/SDL_kmsdrmmouse.c	2020-12-21 20:44:36.000000000 +0300
++++ b/src/video/kmsdrm/SDL_kmsdrmmouse.c	2021-04-13 04:12:43.105582547 +0300
+@@ -310,6 +310,10 @@
+ 
+     /* Get the fb_id for the GBM BO so we can show it on the cursor plane. */
+     fb = KMSDRM_FBFromBO(video_device, dispdata->cursor_bo);
++    if (!fb) {
++        ret = SDL_SetError("Could not get FB from BO");
++        goto cleanup;
++    }
+ 
+     /* Show the GBM BO buffer on the cursor plane. */
+     info.plane = dispdata->cursor_plane;
