@@ -1,0 +1,35 @@
+From c12f46b100d22a0e06a64c5b6d1baa3f446d34e6 Mon Sep 17 00:00:00 2001
+From: Paul Cercueil <paul@crapouillou.net>
+Date: Mon, 22 Mar 2021 19:03:25 +0000
+Subject: [PATCH] [KMSDRM] Fix segmentation fault
+
+Deference the windata pointer *after* checking that it's non-NULL.
+
+Signed-off-by: Paul Cercueil <paul@crapouillou.net>
+---
+ src/video/kmsdrm/SDL_kmsdrmvideo.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/src/video/kmsdrm/SDL_kmsdrmvideo.c b/src/video/kmsdrm/SDL_kmsdrmvideo.c
+index 4d1bc7ae..48c2e8a3 100644
+--- a/src/video/kmsdrm/SDL_kmsdrmvideo.c
++++ b/src/video/kmsdrm/SDL_kmsdrmvideo.c
+@@ -1468,13 +1470,14 @@
+ {
+     SDL_WindowData *windata = (SDL_WindowData *) window->driverdata;
+     SDL_DisplayData *dispdata = (SDL_DisplayData *) SDL_GetDisplayForWindow(window)->driverdata;
+-    SDL_VideoData *viddata = windata->viddata;
++    SDL_VideoData *viddata;
+     SDL_bool is_vulkan = window->flags & SDL_WINDOW_VULKAN; /* Is this a VK window? */
+     unsigned int i, j;
+ 
+     if (!windata) {
+         return;
+     }
++    viddata = windata->viddata;
+ 
+     if (!is_vulkan) {
+         KMSDRM_DestroySurfaces(_this, window);
+-- 
+2.31.1
+
