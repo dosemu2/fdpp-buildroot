@@ -13,6 +13,7 @@ mkdir -p "$BINARIES_DIR/user-part"
 unzip -q /tmp/ndn_3_00_0005_d32.zip -d "$BINARIES_DIR/user-part"
 mv "$BINARIES_DIR/user-part/ndn_3_00_0005_d32" "$BINARIES_DIR/user-part/ndn"
 cp -f "$BOARD_DIR/userhook.bat" "$BINARIES_DIR/user-part"
+cp -f "$BOARD_DIR/a.exe" "$BINARIES_DIR/user-part"
 chmod a+rwX -R "$BINARIES_DIR/user-part"
 
 rm -f "$BINARIES_DIR/user-part.ext4"
