@@ -1,0 +1,4 @@
+# working around this:
+# https://github.com/util-linux/util-linux/issues/1492
+
+mount -a

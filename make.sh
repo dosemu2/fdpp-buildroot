@@ -4,4 +4,4 @@ export dosemu2_SRCDIR=`pwd`/dosemu2
 export fdpp_SRCDIR=`pwd`/fdpp
 export comcom32_SRCDIR=`pwd`/comcom32
 export sdl2_SRCDIR=`pwd`/sdl2
-make -C buildroot BR2_EXTERNAL=$BR2_EXTERNAL BR2_DEFCONFIG=$BR2_DEFCONFIG $*
+time make -C buildroot BR2_EXTERNAL=$BR2_EXTERNAL BR2_DEFCONFIG=$BR2_DEFCONFIG $*
