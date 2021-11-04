@@ -16,10 +16,8 @@ config BR2_PACKAGE_DOSEMU2
     select BR2_PACKAGE_GPM
     select BR2_PACKAGE_READLINE
     select BR2_PACKAGE_SDL2
-    select BR2_PACKAGE_SDL2_KMSDRM
     select BR2_PACKAGE_SDL2_TTF
     select BR2_PACKAGE_FONTCONFIG
-    select BR2_PACKAGE_LIBDRM
     select BR2_PACKAGE_GLIBC_UTILS
     help
       dosemu2 is a virtual machine that allows you to run DOS
