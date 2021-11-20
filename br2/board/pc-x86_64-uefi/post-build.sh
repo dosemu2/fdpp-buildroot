@@ -27,7 +27,7 @@ mv "$TARGET_DIR/etc/fstab_" "$TARGET_DIR/etc/fstab"
 [ -d "$TARGET_DIR/etc/sudoers.d" ] || mkdir "$TARGET_DIR/etc/sudoers.d"
 cp -f "$BOARD_DIR/sudoers.d"/* "$TARGET_DIR/etc/sudoers.d/"
 cp -f "$BOARD_DIR/profile.d"/* "$TARGET_DIR/etc/profile.d/"
-cp -f "$BOARD_DIR/init.d"/* "$TARGET_DIR/etc/init.d/"
+#cp -f "$BOARD_DIR/init.d"/* "$TARGET_DIR/etc/init.d/"
 
 if grep "/sbin/getty" "$TARGET_DIR/etc/inittab" ; then
   grep -v getty "$TARGET_DIR/etc/inittab" >"$TARGET_DIR/etc/inittab_"
