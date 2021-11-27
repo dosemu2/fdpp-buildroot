@@ -1,0 +1,38 @@
+From ca5d241f5b0075dce1df3b2e380108ea80f77733 Mon Sep 17 00:00:00 2001
+From: Stas Sergeev <stsp@users.sourceforge.net>
+Date: Sat, 27 Nov 2021 22:30:07 +0300
+Subject: [PATCH] evdev: scale tablet coords for mouse
+
+The coords must be scaled from 32767x32767 to current window
+resolution.
+See https://github.com/telmich/gpm/pull/23/commits/99e29cb2206d1c5a43c3035098ae1a7f434b9b8f
+for reference.
+---
+ src/core/linux/SDL_evdev.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/core/linux/SDL_evdev.c b/src/core/linux/SDL_evdev.c
+index 9d7c39a87..1b2a26449 100644
+--- a/src/core/linux/SDL_evdev.c
++++ b/src/core/linux/SDL_evdev.c
+@@ -355,7 +355,7 @@ SDL_EVDEV_Poll(void)
+                                 break;
+                             item->touchscreen_data->slots[0].x = events[i].value;
+                         } else
+-                            SDL_SendMouseMotion(mouse->focus, mouse->mouseID, SDL_FALSE, events[i].value, mouse->y);
++                            SDL_SendMouseMotion(mouse->focus, mouse->mouseID, SDL_FALSE, events[i].value * mouse->focus->w / 32767, mouse->y);
+                         break;
+                     case ABS_Y:
+                         if (item->is_touchscreen) {
+@@ -363,7 +363,7 @@ SDL_EVDEV_Poll(void)
+                                 break;
+                             item->touchscreen_data->slots[0].y = events[i].value;
+                         } else
+-                            SDL_SendMouseMotion(mouse->focus, mouse->mouseID, SDL_FALSE, mouse->x, events[i].value);
++                            SDL_SendMouseMotion(mouse->focus, mouse->mouseID, SDL_FALSE, mouse->x, events[i].value * mouse->focus->h / 32767);
+                         break;
+                     default:
+                         break;
+-- 
+2.33.1
+
