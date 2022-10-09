@@ -1,0 +1,32 @@
+name: Build Image
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: package install
+        run: ./ci_prereq.sh
+
+      - name: build
+        run: ./ci_build.sh
+
+      - name: pages
+        if: github.ref == 'refs/heads/master'
+        run: |
+          mkdir -p pub/files
+          zip --junk-paths pub/files/image.zip buildroot/output/images/disk.img
+          echo '<a href="files/image.zip">Latest build</a>' > pub/index.html
+          # Better to keep the page on git later
+
+      - name: deploy
+        if: github.ref == 'refs/heads/master'
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_branch: pages
+          publish_dir: pub
