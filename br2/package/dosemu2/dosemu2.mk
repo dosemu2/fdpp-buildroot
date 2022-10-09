@@ -5,7 +5,7 @@ DOSEMU2_AUTORECONF = YES
 DOSEMU2_AUTORECONF_OPTS = -I m4 --install --force
 
 # mandatory deps
-DOSEMU2_DEPENDENCIES += libbsd fdpp
+DOSEMU2_DEPENDENCIES += host-flex host-bison libbsd fdpp
 # optional deps
 ifeq ($(BR2_PACKAGE_JSON_C),y)
     DOSEMU2_DEPENDENCIES += json-c
