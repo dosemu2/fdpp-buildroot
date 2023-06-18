@@ -22,7 +22,7 @@ $HOST_DIR/bin/genext2fs -U -D "$BOARD_DIR/device_table.txt" -d "$BINARIES_DIR/us
 e2fsck -y "$BINARIES_DIR/user-part.ext4"
 UUID=$(dumpe2fs "$BINARIES_DIR/user-part.ext4" 2>/dev/null | sed -n 's/^Filesystem UUID: *\(.*\)/\1/p')
 grep -v UUID "$TARGET_DIR/etc/fstab" >"$TARGET_DIR/etc/fstab_"
-echo "UUID=\"$UUID\" /mnt/drive_c ext4 rw,nodev,nosuid,noexec,noatime 0 0" >>"$TARGET_DIR/etc/fstab_"
+echo "UUID=\"$UUID\" /mnt/drive_c ext4 rw,nodev,nosuid,noatime 0 0" >>"$TARGET_DIR/etc/fstab_"
 mv "$TARGET_DIR/etc/fstab_" "$TARGET_DIR/etc/fstab"
 [ -d "$TARGET_DIR/mnt/drive_c" ] || mkdir "$TARGET_DIR/mnt/drive_c"
 
