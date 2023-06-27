@@ -17,9 +17,12 @@ cp -f "$BOARD_DIR/userhook.bat" "$BINARIES_DIR/user-part"
 chmod a+rwX -R "$BINARIES_DIR/user-part"
 
 rm -f "$BINARIES_DIR/user-part.ext4"
-$HOST_DIR/bin/genext2fs -U -D "$BOARD_DIR/device_table.txt" -d "$BINARIES_DIR/user-part" -b 16000 "$BINARIES_DIR/user-part.ext4"
+$HOST_DIR/bin/genext2fs -U -D "$BOARD_DIR/device_table.txt" \
+  -d "$BINARIES_DIR/user-part" -b 16000 "$BINARIES_DIR/user-part.ext4"
 # generate UUID with fsck
 e2fsck -y "$BINARIES_DIR/user-part.ext4"
+# convert to ext4
+tune2fs -O extents,uninit_bg,dir_index "$BINARIES_DIR/user-part.ext4"
 UUID=$(dumpe2fs "$BINARIES_DIR/user-part.ext4" 2>/dev/null | sed -n 's/^Filesystem UUID: *\(.*\)/\1/p')
 grep -v UUID "$TARGET_DIR/etc/fstab" >"$TARGET_DIR/etc/fstab_"
 echo "UUID=\"$UUID\" /mnt/drive_c ext4 rw,nodev,nosuid,noatime 0 0" >>"$TARGET_DIR/etc/fstab_"
