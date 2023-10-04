@@ -39,3 +39,6 @@ if grep "/sbin/getty" "$TARGET_DIR/etc/inittab" ; then
   echo "tty1::respawn:/bin/su - dosemu2" >>"$TARGET_DIR/etc/inittab_"
   mv "$TARGET_DIR/etc/inittab_" "$TARGET_DIR/etc/inittab"
 fi
+if ! grep dosemu2 "$TARGET_DIR/etc/passwd" ; then
+  echo "dosemu2::500:500:nobody:/mnt/drive_c:/bin/sh" >>"$TARGET_DIR/etc/passwd"
+fi
