@@ -8,7 +8,8 @@ FDPP_DEPENDENCIES += host-flex host-bison host-pkgconf elfutils
 
 define FDPP_BUILD_CMDS
     cd $(@D) && $$fdpp_SRCDIR/configure
-    $(MAKE) -C $(@D) PREFIX=/usr CXX=$(TARGET_CXX) \
+    $(MAKE) -C $(@D) PREFIX=/usr \
+        CXX=$(TARGET_CXX) \
         BISON="$(HOST_DIR)/bin/bison" \
         LEX="$(HOST_DIR)/bin/flex" \
         PKG_CONFIG=$(PKG_CONFIG_HOST_BINARY) \
