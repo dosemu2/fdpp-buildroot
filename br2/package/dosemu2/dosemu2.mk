@@ -31,9 +31,6 @@ endif
 ifeq ($(BR2_PACKAGE_SDL2_TTF),y)
     DOSEMU2_DEPENDENCIES += sdl2_ttf
 endif
-ifeq ($(BR2_PACKAGE_SDL2_IMAGE),y)
-    DOSEMU2_DEPENDENCIES += sdl2_image
-endif
 ifeq ($(BR2_PACKAGE_FONTCONFIG),y)
     DOSEMU2_DEPENDENCIES += fontconfig
 endif
