@@ -8,6 +8,7 @@ config BR2_PACKAGE_DOSEMU2
     select BR2_PACKAGE_SUDO
     select BR2_PACKAGE_JSON_C
     select BR2_PACKAGE_SLANG
+    select BR2_PACKAGE_LIBB64
     select BR2_PACKAGE_LIBBSD
     select BR2_PACKAGE_LIBAO
     select BR2_PACKAGE_ALSA_LIB
