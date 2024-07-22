@@ -14,9 +14,6 @@ endif
 ifeq ($(BR2_PACKAGE_SLANG),y)
     DOSEMU2_DEPENDENCIES += slang
 endif
-ifeq ($(BR2_PACKAGE_LIBB64),y)
-    DOSEMU2_DEPENDENCIES += libb64
-endif
 ifeq ($(BR2_PACKAGE_LIBAO),y)
     DOSEMU2_DEPENDENCIES += libao
 endif
