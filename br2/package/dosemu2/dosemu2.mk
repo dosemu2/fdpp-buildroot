@@ -3,6 +3,7 @@ DOSEMU2_SITE = https://github.com/dosemu2/dosemu2
 DOSEMU2_USERS = dosemu2 -1 dosemu2 -1 - /home/dosemu2 /bin/bash cdrom,lock,video,input,audio,kvm dosemu2_user
 DOSEMU2_AUTORECONF = YES
 DOSEMU2_AUTORECONF_OPTS = -I m4 --install --force
+DOSEMU2_CONF_OPTS = --disable-searpc
 
 # mandatory deps
 DOSEMU2_DEPENDENCIES += host-flex host-bison host-pkgconf libbsd fdpp
