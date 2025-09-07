@@ -5,6 +5,7 @@ die() {
 
 OVMF=/usr/share/edk2/ovmf/OVMF_CODE.fd
 [ -r "$OVMF" ] || OVMF=/usr/share/OVMF/OVMF_CODE.fd
+[ -r "$OVMF" ] || OVMF=/usr/share/qemu/OVMF.fd
 [ -r "$OVMF" ] || die "ovmf not found"
 
 qemu-system-x86_64 -hda buildroot/output/images/disk.img -enable-kvm \
