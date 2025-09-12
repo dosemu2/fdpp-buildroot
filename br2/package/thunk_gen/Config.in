@@ -1,0 +1,7 @@
+config BR2_PACKAGE_THUNK_GEN
+    bool "thunk_gen"
+    select BR2_PACKAGE_FLEX
+    select BR2_PACKAGE_BISON
+    select BR2_PACKAGE_AUTOCONF
+    help
+      thunk-gen.

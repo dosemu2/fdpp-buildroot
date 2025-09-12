@@ -8,11 +8,11 @@ cp -f "$BOARD_DIR/grub-efi.cfg" "$BINARIES_DIR/efi-part/EFI/BOOT/grub.cfg"
 
 #rm -rf "$BINARIES_DIR/user-part"
 [ -d "$BINARIES_DIR/user-part" ] || mkdir -p "$BINARIES_DIR/user-part"
-[ -f /tmp/ndn_3_00_0005_d32.zip ] || \
-  (cd /tmp && curl -O http://www.ndn.muxe.com/download/file/ndn_3_00_0005_d32.zip)
-[ -d "$BINARIES_DIR/user-part/ndn" ] || \
-  (unzip -q /tmp/ndn_3_00_0005_d32.zip -d "$BINARIES_DIR/user-part" \
-  && mv "$BINARIES_DIR/user-part/ndn_3_00_0005_d32" "$BINARIES_DIR/user-part/ndn")
+[ -f /tmp/ndn_3_00_0011_d32.zip ] || \
+  (cd /tmp && curl -O https://web.archive.org/web/20240106031022if_/http://ndn.muxe.com/download/file/ndn_3_00_0011_d32.zip)
+[ -d "$BINARIES_DIR/user-part/NDN-D32" ] || \
+  (unzip -q /tmp/ndn_3_00_0011_d32.zip -d "$BINARIES_DIR/user-part" \
+  && mv "$BINARIES_DIR/user-part/NDN-D32" "$BINARIES_DIR/user-part/ndn")
 cp -f "$BOARD_DIR/userhook.bat" "$BINARIES_DIR/user-part"
 chmod a+rwX -R "$BINARIES_DIR/user-part"
 

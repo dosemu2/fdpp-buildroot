@@ -2,5 +2,6 @@ config BR2_PACKAGE_FDPP
     bool "fdpp"
     depends on BR2_INSTALL_LIBSTDCPP
     select BR2_PACKAGE_ELFUTILS
+    select BR2_PACKAGE_THUNK_GEN
     help
       freedos++.

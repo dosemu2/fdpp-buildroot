@@ -1,0 +1,4 @@
+config BR2_PACKAGE_COMCOM64
+    bool "comcom64"
+    help
+      64bit command.com
