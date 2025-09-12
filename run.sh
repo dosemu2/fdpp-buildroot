@@ -3,11 +3,10 @@ die() {
     exit 1
 }
 
-OVMF=/usr/share/edk2/ovmf/OVMF_CODE.fd
-[ -r "$OVMF" ] || OVMF=/usr/share/OVMF/OVMF_CODE.fd
-[ -r "$OVMF" ] || OVMF=/usr/share/qemu/OVMF.fd
-[ -r "$OVMF" ] || die "ovmf not found"
+ARGS=`grep linux buildroot/output/images/efi-part/EFI/BOOT/grub.cfg | sed 's/^ //' | cut -d " " -f 3-`
 
 qemu-system-x86_64 -hda buildroot/output/images/disk.img -enable-kvm \
-    -cpu host -bios "$OVMF" \
+    -cpu host,kvm=on,-avx,-avx2,-fma,+vme \
+    -kernel buildroot/output/images/bzImage \
+    -append "$ARGS" \
     -device intel-hda -device hda-duplex -usbdevice tablet -m 2G
