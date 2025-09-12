@@ -1,0 +1,4 @@
+config BR2_PACKAGE_CTAGS
+    bool "ctags"
+    help
+      ctags.

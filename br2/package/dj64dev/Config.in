@@ -1,0 +1,7 @@
+config BR2_PACKAGE_DJ64DEV
+    bool "dj64dev"
+    select BR2_PACKAGE_ELFUTILS
+    select BR2_PACKAGE_THUNK_GEN
+    select BR2_PACKAGE_CTAGS
+    help
+      dj64dev.

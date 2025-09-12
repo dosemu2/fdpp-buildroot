@@ -1,12 +1,13 @@
-DOSEMU2_VERSION = 7de8442ad0d716c4f6f51513a08fe148e8e3dd7c
+DOSEMU2_VERSION = ac98b86256b01fae9d7a076e68bc93833295950b
 DOSEMU2_SITE = https://github.com/dosemu2/dosemu2
+DOSEMU2_SITE_METHOD = git
 DOSEMU2_USERS = dosemu2 -1 dosemu2 -1 - /home/dosemu2 /bin/bash cdrom,lock,video,input,audio,kvm dosemu2_user
 DOSEMU2_AUTORECONF = YES
 DOSEMU2_AUTORECONF_OPTS = -I m4 --install --force
 DOSEMU2_CONF_OPTS = --disable-searpc
 
 # mandatory deps
-DOSEMU2_DEPENDENCIES += host-flex host-bison host-pkgconf libbsd fdpp comcom64
+DOSEMU2_DEPENDENCIES += host-flex host-bison host-pkgconf libbsd fdpp dj64dev comcom64
 # optional deps
 ifeq ($(BR2_PACKAGE_JSON_C),y)
     DOSEMU2_DEPENDENCIES += json-c
