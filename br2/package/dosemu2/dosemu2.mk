@@ -1,4 +1,4 @@
-DOSEMU2_VERSION = ac98b86256b01fae9d7a076e68bc93833295950b
+DOSEMU2_VERSION = devel
 DOSEMU2_SITE = https://github.com/dosemu2/dosemu2
 DOSEMU2_SITE_METHOD = git
 DOSEMU2_USERS = dosemu2 -1 dosemu2 -1 - /home/dosemu2 /bin/bash cdrom,lock,video,input,audio,kvm dosemu2_user

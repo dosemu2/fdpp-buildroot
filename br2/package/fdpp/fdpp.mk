@@ -1,4 +1,4 @@
-FDPP_VERSION = 88c8d89cb072111ca71f076316bd8a70ce863fbd
+FDPP_VERSION = master
 FDPP_SITE = https://github.com/dosemu2/fdpp
 FDPP_SITE_METHOD = git
 FDPP_LICENSE = GPL-3.0+
