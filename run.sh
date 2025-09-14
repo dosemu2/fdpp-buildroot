@@ -9,4 +9,6 @@ qemu-system-x86_64 -hda buildroot/output/images/disk.img -enable-kvm \
     -cpu host,kvm=on,-avx,-avx2,-fma,+vme \
     -kernel buildroot/output/images/bzImage \
     -append "$ARGS" \
-    -device intel-hda -device hda-duplex -usbdevice tablet -m 2G
+    -device intel-hda -device hda-duplex -usbdevice tablet -m 2G \
+    -netdev type=user,id=net0 -device e1000,netdev=net0 \
+    -smp 6
