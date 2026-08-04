@@ -1,1 +1,1 @@
-ndn-d32\ndn.com
+ndn\ndn.com
